@@ -2,7 +2,7 @@ const main = document.querySelector('main'),
       voicesSelect = document.getElementById('voices'),
       textArea = document.getElementById('text'),
       readBtn = document.getElementById('read'),
-      toggle = document.getElementById('toggle'),
+      toggleBtn = document.getElementById('toggle'),
       closeBtn = document.getElementById('close');
 
 const data = [
@@ -34,7 +34,54 @@ function createBox(item) {
         <p class="info">${text}</p>
     `;
 
-    // @todo - speak event
+    box.addEventListener('click', () => {
+        setTextMessage(text);
+        speakText();
+
+        // Add active effect
+        box.classList.add('active');
+        setTimeout(() => box.classList.remove('active'), 800);
+    });
 
     main.appendChild(box);
 }
+
+// Init speech synth
+const message = new SpeechSynthesisUtterance();
+
+// Store voices
+let voices = [];
+
+function getVoices() {
+    voices = speechSynthesis.getVoices();
+
+    voices.forEach(voice => {
+        const option = document.createElement('option');
+
+        option.value = voice.name;
+        option.innerText = `${voice.name} ${voice.lang}`;
+
+        voicesSelect.appendChild(option);
+    });
+}
+
+// Set text
+function setTextMessage(text) {
+    message.text = text;
+}
+
+// Speak text
+function speakText() {
+    speechSynthesis.speak(message);
+}
+
+// Voice changed
+speechSynthesis.addEventListener('voiceschanged', getVoices);
+
+// Toggle text box
+toggleBtn.addEventListener('click', () => document.getElementById('text-box').classList.toggle('show'));
+
+// Close button
+closeBtn.addEventListener('click', () => document.getElementById('text-box').classList.remove('show'));
+
+getVoices();
